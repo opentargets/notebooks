@@ -4,7 +4,7 @@ GITHUB_USER = "opentargets"
 GITHUB_REPO = "notebooks"
 GITHUB_BRANCH = "main"
 
-notebooks_dir = Path("examples")
+notebooks_dir = Path("notebooks")
 notebooks = sorted(notebooks_dir.glob("*.ipynb"))
 
 with open("README.md", "w") as f:
