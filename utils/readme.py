@@ -17,8 +17,8 @@ def get_table(notebooks: list[Path]) -> str:
         str: Markdown table as a string.
     """
     output = []
-    output.append("| Notebook | Google Colab | Binder |")
-    output.append("|---|---|---|")
+    output.append("| Notebook | Google Colab |")
+    output.append("|---|---|")
     for nb in notebooks:
         nb_name = nb.name
         nb_path = f"notebooks/{nb_name}"
@@ -26,15 +26,9 @@ def get_table(notebooks: list[Path]) -> str:
             f"https://colab.research.google.com/github/"
             f"{GITHUB_USER}/{GITHUB_REPO}/blob/{GITHUB_BRANCH}/{nb_path}"
         )
-        binder_url = (
-            f"https://mybinder.org/v2/gh/"
-            f"{GITHUB_USER}/{GITHUB_REPO}/{GITHUB_BRANCH}"
-            f"?filepath={nb_path}"
-        )
         output.append(
             f"| [{nb_name}]({nb_path}) "
-            f"| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_url}) "
-            f"| [![Open In Binder](https://mybinder.org/badge_logo.svg)]({binder_url}) |"
+            f"| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_url}) |"
         )
     return "\n".join(output)
 
