@@ -10,9 +10,14 @@ notebooks = sorted(notebooks_dir.glob("*.ipynb"))
 with open("README.md", "w") as f:
     f.write("<!-- Automatically generated README. Use utils/readme.py to modify it. -->\n\n")
     f.write("# Open Targets Notebooks\n\n")
-    f.write(
-        "This repository contains Notebooks demonstrating how to use the Open Targets Data and pipelines.\n\n"
-    )
+
+    f.write("## How to start\n\n")
+    f.write("To run the notebooks, you can use one of the following options:\n\n")
+    f.write("- [![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/opentargets/notebooks) (recommended)\n")
+    f.write("- Open in Google Colab\n")
+    f.write("- Open in Binder\n")
+    f.write("You can also run the notebooks locally by cloning the repository and installing the required dependencies.\n")
+    f.write("\n\n")
     f.write("| Notebook | Google Colab | Binder |\n")
     f.write("|---|---|---|\n")
     for nb in notebooks:
@@ -32,3 +37,8 @@ with open("README.md", "w") as f:
             f"| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_url}) "
             f"| [![Open In Binder](https://mybinder.org/badge_logo.svg)]({binder_url}) |\n"
         )
+    
+    f.write("## Dependencies (local):\n")
+    f.write("- Java 11\n")
+    f.write("- Python 3.12 or later\n")
+    f.write("- uv")
