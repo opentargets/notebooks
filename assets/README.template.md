@@ -1,7 +1,5 @@
 <!-- Automatically generated README. Use utils/readme.py to modify it. -->
 
-<!-- Automatically generated README. Use utils/readme.py to modify it. -->
-
 <p align="center">
     <img src="assets/platform_logo.png" alt="Open Targets Platform Logo" width="300"/>
 </p>
@@ -26,7 +24,3 @@ For local development, the next dependencies are required:
 - [uv](https://docs.astral.sh/uv/)
 
 ## Notebooks
-
-| Notebook | Google Colab |
-|---|---|
-| [autoimmune_credible_set.ipynb](notebooks/autoimmune_credible_set.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_credible_set.ipynb) |
