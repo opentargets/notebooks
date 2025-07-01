@@ -1,0 +1,52 @@
+{
+  "name": "PySpark & R Notebooks Dev Environment",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-toolsai.jupyter",
+        "ms-python.python",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/notebooks/.venv/bin/python",
+        "notebook.defaultFormatter": "charliermarsh.ruff",
+        "notebook.formatOnSave.enabled": true,
+        "notebook.insertFinalNewline": true,
+        "notebook.output.scrolling": true,
+        "notebook.codeActionsOnSave": {
+          "source.fixAll.ruff": "explicit",
+          "source.unusedImports": "explicit",
+          "source.convertImportFormat": "explicit",
+          "source.organizeImports.ruff": "explicit"
+        },
+        "notebook.variablesView": true,
+        "notebook.showCellStatusBar": "visible",
+      }
+    }
+  },
+  "forwardPorts": [8888, 4040, 4041, 4042, 4043],
+  "portsAttributes": {
+    "8888": {
+      "label": "Jupyter Lab",
+      "onAutoForward": "openBrowser"
+    },
+    "4040": {
+      "label": "Spark UI"
+    }
+  },
+  "postCreateCommand": [
+    "bash",
+    "-c",
+    "echo 'Dev container setup complete! Jupyter Lab will be available on port 8888'"
+  ],
+  "remoteUser": "ot",
+  "workspaceFolder": "/notebooks"
+}

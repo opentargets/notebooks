@@ -17,7 +17,7 @@ with open("README.md", "w") as f:
     f.write("|---|---|---|\n")
     for nb in notebooks:
         nb_name = nb.name
-        nb_path = f"examples/{nb_name}"
+        nb_path = f"notebooks/{nb_name}"
         colab_url = (
             f"https://colab.research.google.com/github/"
             f"{GITHUB_USER}/{GITHUB_REPO}/blob/{GITHUB_BRANCH}/{nb_path}"
