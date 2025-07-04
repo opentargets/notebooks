@@ -23,7 +23,7 @@
         "notebook.output.scrolling": true,
         "notebook.codeActionsOnSave": {
           "source.fixAll.ruff": "explicit",
-          "source.unusedImports": "explicit",
+          "source.unusedImports": "never",
           "source.convertImportFormat": "explicit",
           "source.organizeImports.ruff": "explicit"
         },
