@@ -13,7 +13,7 @@ To run the notebooks, you can use one of the following options:
 
 [![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/opentargets/notebooks)
 
-2. Open in Google Colab or Binder (see table)
+2. Open in Google Colab (see table)
 3. You can also run the notebooks locally by cloning the repository and installing the required dependencies.
 
 ## Local
