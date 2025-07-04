@@ -29,4 +29,5 @@ For local development, the next dependencies are required:
 
 | Notebook | Google Colab |
 |---|---|
+| [autoimmune_colocalisations.ipynb](notebooks/autoimmune_colocalisations.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_colocalisations.ipynb) |
 | [autoimmune_credible_set.ipynb](notebooks/autoimmune_credible_set.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_credible_set.ipynb) |
