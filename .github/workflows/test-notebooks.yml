@@ -80,12 +80,12 @@ jobs:
               echo "::error::Invalid notebook name. Only alphanumeric, underscore, hyphen, and dot allowed."
               exit 1
             fi
-            TEST_ARGS="tests/test_notebooks.py -v -k ${NOTEBOOK_FILTER} --junitxml=/tmp/test-results.xml"
+            TEST_ARGS="tests/test_notebooks.py -v -k \"${NOTEBOOK_FILTER}\" --junitxml=/tmp/test-results.xml"
           else
             TEST_ARGS="tests/ -v -m notebook --junitxml=/tmp/test-results.xml"
           fi
           
-          # Create Cloud Run Job (or update if exists)
+          # Create Cloud Run Job
           JOB_NAME="notebook-test-${{ github.run_id }}"
           
           gcloud run jobs create $JOB_NAME \
@@ -97,8 +97,7 @@ jobs:
             --cpu=4 \
             --set-env-vars="PYTHONUNBUFFERED=1,TEST_ARGS=${TEST_ARGS}" \
             --command="/bin/bash" \
-            --args="-c","cd /workspace && uv run pytest \$TEST_ARGS" \
-            || echo "Job might already exist, will update"
+            --args="-c","cd /workspace && eval \"uv run pytest \$TEST_ARGS\""
           
           # Execute the job and capture the execution name
           EXECUTION=$(gcloud run jobs execute $JOB_NAME \
