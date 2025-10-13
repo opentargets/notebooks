@@ -32,15 +32,13 @@ resource "google_service_account" "github_actions" {
   depends_on = [google_project_service.required_apis]
 }
 
-# Grant IAM roles to the service account
+# Grant IAM roles to the service account (principle of least privilege)
 resource "google_project_iam_member" "github_actions_roles" {
   for_each = toset([
-    "roles/storage.objectViewer",       # Access to GCS data
-    "roles/run.admin",                  # Manage Cloud Run jobs
-    "roles/artifactregistry.admin",     # Push/pull Docker images
-    "roles/cloudbuild.builds.editor",   # Build Docker images
-    "roles/iam.serviceAccountUser",     # Execute as service account
-    "roles/logging.viewer",             # Read logs
+    "roles/run.developer",              # Create/update/delete Cloud Run jobs and executions
+    "roles/artifactregistry.writer",    # Push Docker images to Artifact Registry
+    "roles/iam.serviceAccountUser",     # Required for Cloud Run to act as service account
+    "roles/logging.viewer",             # Read Cloud Run job logs
   ])
 
   project = var.project_id

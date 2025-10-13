@@ -12,7 +12,11 @@ This Terraform configuration provisions:
    - Artifact Registry, Compute Engine, Logging
 
 2. **Service Account**: `github-actions-notebooks@open-targets-eu-dev.iam.gserviceaccount.com`
-   - With appropriate IAM roles for CI/CD operations
+   - With minimal IAM roles following the principle of least privilege:
+     - `roles/run.developer` - Create/manage Cloud Run jobs
+     - `roles/artifactregistry.writer` - Push Docker images
+     - `roles/iam.serviceAccountUser` - Execute as service account
+     - `roles/logging.viewer` - Read logs
 
 3. **Workload Identity Federation**:
    - Workload Identity Pool for GitHub Actions
@@ -226,13 +230,47 @@ terraform import google_service_account.github_actions projects/open-targets-eu-
 # ... import other resources as needed
 ```
 
+## IAM Roles Explained
+
+The service account is granted minimal permissions following the principle of least privilege:
+
+### `roles/run.developer`
+**Why**: Create, update, execute, and delete Cloud Run jobs  
+**Not used**: `roles/run.admin` (too broad, includes policy management)  
+**Permissions**: Manage Cloud Run resources but not IAM policies
+
+### `roles/artifactregistry.writer`
+**Why**: Push Docker images to Artifact Registry  
+**Not used**: `roles/artifactregistry.admin` (can delete repos, manage IAM)  
+**Permissions**: Read and write images, but not repo management
+
+### `roles/iam.serviceAccountUser`
+**Why**: Required for Cloud Run to execute using this service account  
+**Cannot avoid**: This is the minimum permission for Cloud Run execution  
+**Permissions**: Allows Cloud Run to "act as" the service account
+
+### `roles/logging.viewer`
+**Why**: Read logs from Cloud Run executions  
+**Not used**: Project-level logging admin roles  
+**Permissions**: Read-only access to logs
+
+### Removed Roles
+
+These were in earlier versions but removed as unnecessary:
+- ❌ `roles/storage.objectViewer` - Data is publicly accessible
+- ❌ `roles/run.admin` - Too broad, `run.developer` is sufficient
+- ❌ `roles/artifactregistry.admin` - Too broad, `writer` is sufficient
+- ❌ `roles/cloudbuild.builds.editor` - Not needed (build in GitHub Actions)
+
 ## Security Best Practices
 
 1. ✅ Never commit `.tfvars` files with sensitive data
 2. ✅ Use Workload Identity Federation (no long-lived keys)
-3. ✅ Review IAM permissions regularly
-4. ✅ Use remote state with encryption for production
-5. ✅ Enable state locking with remote backends
+3. ✅ Follow principle of least privilege for IAM roles
+4. ✅ Scope service account to specific repository only
+5. ✅ Review IAM permissions regularly
+6. ✅ Use remote state with encryption for production
+7. ✅ Enable state locking with remote backends
 
 ## Resources Created
 
