@@ -23,4 +23,24 @@ For local development, the next dependencies are required:
 - Python 3.12 or later
 - [uv](https://docs.astral.sh/uv/)
 
+## Testing
+
+This project includes automated tests for all notebooks.
+
+### Local tests
+
+```bash
+# Install dependencies including test extras
+uv sync --all-extras
+
+# Run all notebook tests
+./scripts/run_notebook_test.sh
+
+# Run specific notebook test
+./scripts/run_notebook_test.sh autoimmune_colocalisations
+```
+
+Remote regular testing is also implemented within GCP. More information in `./scripts/setup_gcp.sh`.
+
+
 ## Notebooks

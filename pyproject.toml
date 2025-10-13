@@ -13,3 +13,21 @@ dependencies = [
     "pyspark>=3.5.0,<4.0.0",
     "ray>=2.49.2",
 ]
+
+[project.optional-dependencies]
+test = [
+    "papermill>=2.6.0",
+    "pytest>=8.0.0",
+    "nbformat>=5.10.0",
+    "nbclient>=0.10.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "notebook: notebook execution tests",
+]
+addopts = "-v --tb=short"
