@@ -70,12 +70,19 @@ jobs:
       
       - name: Run tests on Cloud Run Job
         id: run_tests
+        env:
+          NOTEBOOK_FILTER: ${{ github.event.inputs.notebook }}
         run: |
-          # Determine which notebooks to test
-          if [ -n "${{ github.event.inputs.notebook }}" ]; then
-            TEST_CMD="pytest tests/test_notebooks.py -v -k '${{ github.event.inputs.notebook }}' --junitxml=/tmp/test-results.xml"
+          # Sanitize and validate notebook input
+          if [ -n "$NOTEBOOK_FILTER" ]; then
+            # Only allow alphanumeric, underscore, hyphen, and dot
+            if ! echo "$NOTEBOOK_FILTER" | grep -qE '^[a-zA-Z0-9_.-]+$'; then
+              echo "::error::Invalid notebook name. Only alphanumeric, underscore, hyphen, and dot allowed."
+              exit 1
+            fi
+            TEST_ARGS="tests/test_notebooks.py -v -k ${NOTEBOOK_FILTER} --junitxml=/tmp/test-results.xml"
           else
-            TEST_CMD="pytest tests/ -v -m notebook --junitxml=/tmp/test-results.xml"
+            TEST_ARGS="tests/ -v -m notebook --junitxml=/tmp/test-results.xml"
           fi
           
           # Create Cloud Run Job (or update if exists)
@@ -88,9 +95,9 @@ jobs:
             --max-retries=0 \
             --memory=8Gi \
             --cpu=4 \
-            --set-env-vars="PYTHONUNBUFFERED=1" \
+            --set-env-vars="PYTHONUNBUFFERED=1,TEST_ARGS=${TEST_ARGS}" \
             --command="/bin/bash" \
-            --args="-c","uv sync --all-extras && uv run $TEST_CMD; EXIT_CODE=\$?; echo 'Test exit code:' \$EXIT_CODE; exit \$EXIT_CODE" \
+            --args="-c","cd /workspace && uv run pytest \$TEST_ARGS" \
             || echo "Job might already exist, will update"
           
           # Execute the job and capture the execution name
@@ -100,32 +107,43 @@ jobs:
           
           echo "Execution: $EXECUTION"
           
-          # Wait for job completion and stream logs
+          # Wait for job completion (blocks until done)
           echo "Waiting for job to complete..."
-          gcloud run jobs executions describe $EXECUTION \
-            --region=${{ env.GCP_REGION }} \
-            --format='value(status.completionTime)' \
-            > /dev/null 2>&1 || true
+          gcloud run jobs executions wait $EXECUTION \
+            --region=${{ env.GCP_REGION }} || WAIT_EXIT_CODE=$?
           
-          # Get logs
+          # Get logs after completion
           echo "Fetching logs..."
+          sleep 10  # Allow logs to propagate to Cloud Logging
           gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=$JOB_NAME" \
             --limit=500 \
             --format="table(timestamp,textPayload)" \
-            --project=${{ env.GCP_PROJECT_ID }}
+            --project=${{ env.GCP_PROJECT_ID }} \
+            --freshness=10m
           
-          # Check job status
+          # Check final job status
           STATUS=$(gcloud run jobs executions describe $EXECUTION \
             --region=${{ env.GCP_REGION }} \
             --format='value(status.conditions[0].type)')
           
-          echo "Job status: $STATUS"
+          SUCCEEDED=$(gcloud run jobs executions describe $EXECUTION \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.succeededCount)')
           
-          # Clean up job
+          FAILED=$(gcloud run jobs executions describe $EXECUTION \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.failedCount)')
+          
+          echo "Job status: $STATUS"
+          echo "Succeeded: $SUCCEEDED, Failed: $FAILED"
+          
+          # Clean up job (always run)
+          echo "Cleaning up Cloud Run job..."
           gcloud run jobs delete $JOB_NAME --region=${{ env.GCP_REGION }} --quiet || true
           
-          if [ "$STATUS" != "Completed" ]; then
-            echo "::error::Job failed with status: $STATUS"
+          # Check if job succeeded
+          if [ "$SUCCEEDED" != "1" ] || [ "$FAILED" != "0" ]; then
+            echo "::error::Job failed - Succeeded: $SUCCEEDED, Failed: $FAILED"
             exit 1
           fi
       
