@@ -25,20 +25,11 @@ For local development, the next dependencies are required:
 - Python 3.12 or later
 - [uv](https://docs.astral.sh/uv/)
 
-## Notebooks
-
-| Notebook | Google Colab |
-|---|---|
-| [autoimmune_colocalisations.ipynb](notebooks/autoimmune_colocalisations.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_colocalisations.ipynb) |
-| [autoimmune_credible_set.ipynb](notebooks/autoimmune_credible_set.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_credible_set.ipynb) |
-| [exploring_ot_datasets.ipynb](notebooks/exploring_ot_datasets.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/exploring_ot_datasets.ipynb) |
-
-
 ## Testing
 
-This project includes automated tests for all notebooks.
+This project includes automated smoke tests for all notebooks, running monthly on GCP Cloud Run.
 
-### Local tests
+### Run Tests Locally
 
 ```bash
 # Install dependencies including test extras
@@ -51,4 +42,29 @@ uv sync --all-extras
 ./scripts/run_notebook_test.sh autoimmune_colocalisations
 ```
 
-Remote regular testing is also implemented within GCP. More information in `./scripts/setup_gcp.sh`.
+### Setup CI/CD (One-time)
+
+Tests run automatically on GCP Cloud Run with Workload Identity Federation for secure authentication.
+
+```bash
+# Navigate to terraform directory
+cd terraform
+
+# Initialize and apply Terraform configuration
+terraform init
+terraform apply
+
+# Copy the output secrets to GitHub repository settings
+terraform output github_secrets_summary
+```
+
+See [terraform/README.md](terraform/README.md) for detailed setup instructions.
+
+
+## Notebooks
+
+| Notebook | Google Colab |
+|---|---|
+| [autoimmune_colocalisations.ipynb](notebooks/autoimmune_colocalisations.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_colocalisations.ipynb) |
+| [autoimmune_credible_set.ipynb](notebooks/autoimmune_credible_set.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/autoimmune_credible_set.ipynb) |
+| [exploring_ot_datasets.ipynb](notebooks/exploring_ot_datasets.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opentargets/notebooks/blob/main/notebooks/exploring_ot_datasets.ipynb) |
