@@ -25,7 +25,7 @@ For local development, the next dependencies are required:
 
 ## Testing
 
-This project includes automated smoke tests for all notebooks, running monthly on GCP Cloud Run.
+This project includes automated smoke tests for all notebooks.
 
 ### Run Tests Locally
 
@@ -39,24 +39,6 @@ uv sync --all-extras
 # Run specific notebook test
 ./scripts/run_notebook_test.sh autoimmune_colocalisations
 ```
-
-### Setup CI/CD (One-time)
-
-Tests run automatically on GCP Cloud Run with Workload Identity Federation for secure authentication.
-
-```bash
-# Navigate to terraform directory
-cd terraform
-
-# Initialize and apply Terraform configuration
-terraform init
-terraform apply
-
-# Copy the output secrets to GitHub repository settings
-terraform output github_secrets_summary
-```
-
-See [terraform/README.md](terraform/README.md) for detailed setup instructions.
 
 
 ## Notebooks
