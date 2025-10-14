@@ -48,6 +48,19 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Place executables in the environment at the front of the path
 ENV PATH="/notebooks/.venv/bin:$PATH"
 
+# Stage 2: Test stage - For running notebook tests
+FROM builder AS test
+
+# Install test dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --all-extras
+
+# Set working directory
+WORKDIR /notebooks
+
+# Run tests by default
+CMD ["uv", "run", "pytest", "tests/", "-v", "-m", "notebook"]
+
 # Set environment variables for PySpark and Hail locations
 # ENV SPARK_HOME=/notebooks/.venv/lib/python3.12/site-packages/pyspark
 # ENV HAIL_DIR=/notebooks/.venv/lib/python3.12/site-packages/hail

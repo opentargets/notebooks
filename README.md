@@ -42,6 +42,22 @@ uv sync --all-extras
 ./scripts/run_notebook_test.sh autoimmune_colocalisations
 ```
 
+### Run Tests with Docker
+
+```bash
+# Build the test image
+docker build --target test -t notebooks-test .
+
+# Run all notebook tests
+docker run --rm notebooks-test
+
+# Run specific notebook test
+docker run --rm notebooks-test uv run pytest tests/test_notebooks.py -v -k autoimmune_colocalisations
+
+# Run with custom pytest options
+docker run --rm notebooks-test uv run pytest tests/ -v --tb=short
+```
+
 
 ## Notebooks
 
