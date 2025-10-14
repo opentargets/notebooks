@@ -1,7 +1,3 @@
-<!-- Automatically generated README. Use utils/readme.py to modify it. -->
-
-<!-- Automatically generated README. Use utils/readme.py to modify it. -->
-
 <p align="center">
     <img src="assets/platform_logo.png" alt="Open Targets Platform Logo" width="300"/>
 </p>
