@@ -1,10 +1,13 @@
 # Stage 1: Build stage - Used to prepare dependencies and package the application
 FROM python:3.12-slim-bookworm AS base
 
+# Add Debian Bullseye repository for Java 11 (not available in Bookworm)
+RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list && \
+    echo "Package: *\nPin: release n=bullseye\nPin-Priority: 100" > /etc/apt/preferences.d/bullseye
+
 # Install Java runtime (required for PySpark/Hail) and procps for process management
-RUN echo "deb http://deb.debian.org/debian oldstable main" >> /etc/apt/sources.list
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y openjdk-11-jdk-headless procps make rsync && \
+    apt-get install --no-install-recommends -y openjdk-11-jdk-headless/bullseye procps make rsync && \
     # Clean up apt cache to reduce image size
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -15,8 +18,12 @@ RUN groupadd -g 1001 ot && \
     mkdir -p /notebooks && \
     chown ot:ot /notebooks
 
-# Set up JAVA_HOME environment variable
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64
+# Detect architecture and set JAVA_HOME
+ARG TARGETARCH
+RUN JAVA_DIR=$(ls -d /usr/lib/jvm/java-11-openjdk-* 2>/dev/null | head -1) && \
+    ln -sf ${JAVA_DIR} /usr/lib/jvm/java-11-current
+
+ENV JAVA_HOME=/usr/lib/jvm/java-11-current
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 FROM base AS builder
@@ -48,18 +55,24 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Place executables in the environment at the front of the path
 ENV PATH="/notebooks/.venv/bin:$PATH"
 
-# Set environment variables for PySpark and Hail locations
-# ENV SPARK_HOME=/notebooks/.venv/lib/python3.12/site-packages/pyspark
-# ENV HAIL_DIR=/notebooks/.venv/lib/python3.12/site-packages/hail
+# Stage 2: Test stage - For running notebook tests
+FROM builder AS test
 
-# # Copy notebooks directory contents into the image
-# COPY --chown=ot:ot notebooks/ ./notebooks/
+# Install test dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --all-extras
 
-# # Copy other project files
-# COPY --chown=ot:ot . .
+# Set working directory
+WORKDIR /notebooks
 
-# # Switch to non-root user
-# USER ot
+# Run tests by default
+CMD ["uv", "run", "pytest", "tests/", "-v", "-m", "notebook"]
+
+# Stage 3: Production stage - For running Jupyter Lab
+FROM builder AS production
+
+# Set working directory
+WORKDIR /notebooks
 
 # Expose Jupyter Lab port
 EXPOSE 8888
