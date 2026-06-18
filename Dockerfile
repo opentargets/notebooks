@@ -1,10 +1,10 @@
 # Stage 1: Build stage - Used to prepare dependencies and package the application
 FROM python:3.12-slim-bookworm AS base
 
-# Install Java runtime (required for PySpark/Hail) and procps for process management
-RUN echo "deb http://deb.debian.org/debian oldstable main" >> /etc/apt/sources.list
+# Install Java runtime (required for PySpark) and procps for process management.
+# PySpark 3.5 supports Java 8/11/17; we use 17 since it ships in bookworm.
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y openjdk-11-jdk-headless procps make rsync && \
+    apt-get install --no-install-recommends -y openjdk-17-jre-headless procps make rsync && \
     # Clean up apt cache to reduce image size
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -16,7 +16,7 @@ RUN groupadd -g 1001 ot && \
     chown ot:ot /notebooks
 
 # Set up JAVA_HOME environment variable
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 FROM base AS builder
