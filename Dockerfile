@@ -52,20 +52,19 @@ ENV PATH="/notebooks/.venv/bin:$PATH"
 # ENV SPARK_HOME=/notebooks/.venv/lib/python3.12/site-packages/pyspark
 # ENV HAIL_DIR=/notebooks/.venv/lib/python3.12/site-packages/hail
 
-# # Copy notebooks directory contents into the image
-# COPY --chown=ot:ot notebooks/ ./notebooks/
-
-# # Copy other project files
-# COPY --chown=ot:ot . .
-
-# # Switch to non-root user
-# USER ot
-
 # Expose Jupyter Lab port
 EXPOSE 8888
 
 # Expose Spark UI ports
 EXPOSE 4040 4041 4042 4043
 
-# Default command
-CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''"]
+# Run as the non-root user created in the base stage
+USER ot
+
+# Default command.
+# Authentication is intentionally NOT disabled: Jupyter generates a random
+# token at startup (printed to the container logs), or honours a JUPYTER_TOKEN
+# environment variable if one is supplied. Never reintroduce empty
+# --NotebookApp.token / --NotebookApp.password values: doing so exposes an
+# unauthenticated remote-code-execution surface to anyone who can reach 8888.
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
